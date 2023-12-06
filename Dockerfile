@@ -1,12 +1,15 @@
 
-FROM alpine:3.10
+FROM timbru31/ruby-node:3.1
 
-# Install system dependencies
-RUN apk add --no-cache --update   bash   gcc   g++   make   python2   python2-dev   py2-pip   musl-dev   postgresql-dev   git   nodejs   nodejs-npm
-
-ADD ./ /app/webapp/
 WORKDIR /app/webapp/
+
+RUN gem update bundler
+COPY Gemfile Gemfile.lock /app/webapp/
+RUN bundle install
+
+COPY package.json package-lock.json /app/webapp/
 RUN npm install
-RUN adduser -D myuser
-USER myuser
+
+COPY . /app/webapp/
+
 CMD ["npm", "start"]
