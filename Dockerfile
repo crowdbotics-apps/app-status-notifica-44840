@@ -28,4 +28,3 @@ RUN npm install
 COPY . /app/webapp/
 
 CMD ["npm", "start"]
-
