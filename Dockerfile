@@ -1,4 +1,3 @@
-
 # Start from the base image
 FROM timbru31/ruby-node:3.1
 
