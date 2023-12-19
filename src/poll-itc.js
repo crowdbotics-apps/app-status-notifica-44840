@@ -51,7 +51,14 @@ async function _checkAppStatus(currentAppInfo) {
     const snapshot = await dab.ref(appInfoKey).once('value');
     const datarecordItem = snapshot.val();
     //console.log(datarecordItem);
-    
+    var validStates = [
+        "REJECTED",
+        "READY_FOR_SALE",
+        "PENDING_DEVELOPER_RELEASE",
+        "REMOVED_FROM_SALE",
+        "METADATA_REJECTED",
+        "DEVELOPER_REMOVED_FROM_SALE"
+      ];
     if(!datarecordItem){
         //database.push("/"+appInfoKey,currentAppInfo);
         await dab.ref(appInfoKey).set(currentAppInfo);
@@ -62,12 +69,16 @@ async function _checkAppStatus(currentAppInfo) {
                 if(datarecordItem.app_store_versions.some(oneBuild => oneBuild.id === buildInfo.id)) {  
                     const matchingBuild = datarecordItem.app_store_versions.find(oneBuild => oneBuild.id === buildInfo.id);
                     if(matchingBuild.app_store_state != buildInfo.app_store_state){
+                        if (validStates.includes(buildInfo.app_store_state)) {
+                            poster.slackBuild(currentAppInfo, buildInfo)
+                        }
                         buildChanged = true
-                        poster.slackBuild(currentAppInfo, buildInfo)
                     }
                 }else{
+                    if (validStates.includes(buildInfo.app_store_state)) {
+                        poster.slackBuild(currentAppInfo, buildInfo)
+                    }
                     buildChanged = true
-                    poster.slackBuild(currentAppInfo, buildInfo)
                 }
             })
             if(buildChanged){
